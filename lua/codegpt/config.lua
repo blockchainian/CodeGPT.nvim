@@ -17,10 +17,14 @@ vim.g["codegpt_hooks"] = {
 -- Border style to use for the popup
 vim.g["codegpt_popup_border"] = { style = "rounded" }
 
--- Wraps the text on the popup window, deprecated in favor of codegpt_popup_window_options
+-- Wraps the text on the popup window, deprecated in favor of the two options below
 vim.g["codegpt_wrap_popup_text"] = true
 
-vim.g["codegpt_popup_window_options"] = {}
+-- set the window options of a code popup
+vim.g["codegpt_code_popup_window_options"] = {}
+
+-- set the window options of a text popup
+vim.g["codegpt_text_popup_window_options"] = {}
 
 -- set the filetype of a text popup is markdown
 vim.g["codegpt_text_popup_filetype"] = "markdown"

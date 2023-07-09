@@ -15,12 +15,12 @@ local cmd_default = {
 CommandsList.CallbackTypes = {
     ["text_popup"] = function(lines, bufnr, start_row, start_col, end_row, end_col)
         local popup_filetype = vim.g["codegpt_text_popup_filetype"]
-        Ui.popup(lines, popup_filetype, bufnr, start_row, start_col, end_row, end_col)
+        Ui.popup(lines, 'text_popup', popup_filetype, bufnr, start_row, start_col, end_row, end_col)
     end,
     ["code_popup"] = function(lines, bufnr, start_row, start_col, end_row, end_col)
         lines = Utils.trim_to_code_block(lines)
         Utils.fix_indentation(bufnr, start_row, end_row, lines)
-        Ui.popup(lines, Utils.get_filetype(), bufnr, start_row, start_col, end_row, end_col)
+        Ui.popup(lines, 'code_popup', Utils.get_filetype(), bufnr, start_row, start_col, end_row, end_col)
     end,
     ["replace_lines"] = function(lines, bufnr, start_row, start_col, end_row, end_col)
         lines = Utils.trim_to_code_block(lines)
@@ -29,7 +29,7 @@ CommandsList.CallbackTypes = {
             Utils.replace_lines(lines, bufnr, start_row, start_col, end_row, end_col)
         else
             -- if the buffer is not valid, open a popup. This can happen when the user closes the previous popup window before the request is finished.
-            Ui.popup(lines, Utils.get_filetype(), bufnr, start_row, start_col, end_row, end_col)
+            Ui.popup(lines, 'code_popup', Utils.get_filetype(), bufnr, start_row, start_col, end_row, end_col)
         end
     end,
     ["custom"] = nil,

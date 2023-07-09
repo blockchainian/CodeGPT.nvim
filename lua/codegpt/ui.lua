@@ -67,9 +67,15 @@ local function create_vertical()
     return split
 end
 
-local function create_popup()
+local function create_popup(type)
     if not popup then
-        local window_options = vim.g["codegpt_popup_window_options"]
+        local window_options
+
+        if type == "code_popup" then
+            window_options = vim.g["codegpt_code_popup_window_options"]
+        else
+            window_options = vim.g["codegpt_text_popup_window_options"]
+        end
         if window_options == nil then
             window_options = {}
         end
@@ -97,7 +103,7 @@ local function create_popup()
     return popup
 end
 
-function Ui.popup(lines, filetype, bufnr, start_row, start_col, end_row, end_col)
+function Ui.popup(lines, type, filetype, bufnr, start_row, start_col, end_row, end_col)
     local popup_type = vim.g["codegpt_popup_type"]
     local ui_elem = nil
     if popup_type == "horizontal" then
@@ -105,7 +111,7 @@ function Ui.popup(lines, filetype, bufnr, start_row, start_col, end_row, end_col
     elseif popup_type == "vertical" then
         ui_elem = create_vertical()
     else
-        ui_elem = create_popup()
+        ui_elem = create_popup(type)
     end
     setup_ui_element(lines, filetype, bufnr, start_row, start_col, end_row, end_col, ui_elem)
 end
