@@ -27,6 +27,7 @@ local function setup_ui_element(lines, filetype, bufnr, start_row, start_col, en
 
     -- replace lines when ctrl-o pressed
     ui_elem:map("n", vim.g["codegpt_ui_commands"].use_as_output, function()
+        Utils.fix_indentation(bufnr, start_row, end_row, lines)
         vim.api.nvim_buf_set_text(bufnr, start_row, start_col, end_row, end_col, lines)
         ui_elem:unmount()
     end)

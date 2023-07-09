@@ -19,7 +19,6 @@ CommandsList.CallbackTypes = {
     end,
     ["code_popup"] = function(lines, bufnr, start_row, start_col, end_row, end_col)
         lines = Utils.trim_to_code_block(lines)
-        Utils.fix_indentation(bufnr, start_row, end_row, lines)
         Ui.popup(lines, 'code_popup', Utils.get_filetype(), bufnr, start_row, start_col, end_row, end_col)
     end,
     ["replace_lines"] = function(lines, bufnr, start_row, start_col, end_row, end_col)
