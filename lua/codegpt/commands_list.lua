@@ -25,6 +25,7 @@ CommandsList.CallbackTypes = {
         lines = Utils.trim_to_code_block(lines)
         Utils.fix_indentation(bufnr, start_row, end_row, lines)
         if vim.api.nvim_buf_is_valid(bufnr) == true then
+            -- FIXME: streaming has broken this
             Utils.replace_lines(lines, bufnr, start_row, start_col, end_row, end_col)
         else
             -- if the buffer is not valid, open a popup. This can happen when the user closes the previous popup window before the request is finished.

@@ -47,6 +47,7 @@ function OpenAIProvider.make_request(command, cmd_opts, command_args, text_selec
         model = cmd_opts.model,
         messages = messages,
         max_tokens = max_tokens,
+        stream = true,
     }
 
     return request
@@ -68,13 +69,18 @@ function OpenAIProvider.handle_response(json, cb)
         print("Response empty")
     elseif json.error then
         print("Error: " .. json.error.message)
-    elseif not json.choices or 0 == #json.choices or not json.choices[1].message then
+    elseif not json.choices or 0 == #json.choices or (not json.choices[1].message and not json.choices[1].delta) then
         print("Error: " .. vim.fn.json_encode(json))
     else
-        local response_text = json.choices[1].message.content
+        local response_text
+        if json.choices[1].delta then
+            response_text = json.choices[1].delta.content
+        else
+            response_text = json.choices[1].message.content
+        end
 
         if response_text ~= nil then
-            if type(response_text) ~= "string" or response_text == "" then
+            if type(response_text) ~= "string" then
                 print("Error: No response text " .. type(response_text))
             else
                 local bufnr = vim.api.nvim_get_current_buf()
@@ -84,8 +90,6 @@ function OpenAIProvider.handle_response(json, cb)
                 end
                 cb(Utils.parse_lines(response_text))
             end
-        else
-            print("Error: No message")
         end
     end
 end

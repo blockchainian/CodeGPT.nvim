@@ -58,6 +58,33 @@ local function curl_callback(response, cb)
     run_finished_hook()
 end
 
+local function curl_stream_handler(error, response, cb)
+    if error ~= nil then
+        print("Error: " .. error)
+        run_finished_hook()
+        return
+    end
+
+    if response == nil then
+        run_finished_hook()
+        return
+    end
+
+    local data = response:gsub("data: ", "")
+    if data == "[DONE]" then
+        run_finished_hook()
+        return
+    end
+    if data == "" then
+        return
+    end
+
+    vim.schedule_wrap(function(msg)
+        local json = vim.fn.json_decode(msg)
+        Providers.get_provider().handle_response(json, cb)
+    end)(data)
+end
+
 function OpenAIApi.make_call(payload, cb)
     local payload_str = vim.fn.json_encode(payload)
     local url = vim.g["codegpt_chat_completions_url"]
@@ -68,6 +95,9 @@ function OpenAIApi.make_call(payload, cb)
     curl.post(url, {
         body = payload_str,
         headers = headers,
+        stream = function(error, data, self)
+            curl_stream_handler(error, data, cb)
+        end,
         callback = function(response)
             curl_callback(response, cb)
         end,

@@ -67,7 +67,7 @@ end
 
 local function contains_code_block(lines2)
     for _, line in ipairs(lines2) do
-        if line:match("^```") then
+        if line:match("^```") or line == Utils.get_filetype() then
             return true
         end
     end
@@ -86,7 +86,15 @@ function Utils.parse_lines(response_text)
         vim.api.nvim_err_write("ChatGPT response: \n" .. response_text .. "\n")
     end
 
-    return vim.fn.split(response_text, "\n")
+    -- workaround for vim.fn.split
+    local lines = vim.fn.split(response_text, "\n")
+    if response_text:sub(-1) == "\n" then
+        table.insert(lines, "")
+        if #response_text == 1 then
+            table.insert(lines, "")
+        end
+    end
+    return lines
 end
 
 function Utils.fix_indentation(bufnr, start_row, end_row, new_lines)

@@ -7,6 +7,13 @@ local Ui = {}
 local popup
 local split
 
+local function get_last_offset(ui_elem)
+    local last_row = vim.api.nvim_buf_line_count(ui_elem.bufnr) - 1
+    local last_line = vim.api.nvim_buf_get_lines(ui_elem.bufnr, last_row, last_row + 1, false)[1]
+    local last_col = last_line and #last_line or 0
+    return last_row, last_col
+end
+
 local function setup_ui_element(lines, filetype, bufnr, start_row, start_col, end_row, end_col, ui_elem)
     -- mount/open the component
     ui_elem:mount()
@@ -22,13 +29,21 @@ local function setup_ui_element(lines, filetype, bufnr, start_row, start_col, en
     end, { noremap = true, silent = true })
 
     -- set content
+    local last_row, last_col = get_last_offset(ui_elem)
+    local new_col = last_col + (lines and #lines > 0 and #lines[1] or 0)
     vim.api.nvim_buf_set_option(ui_elem.bufnr, "filetype", filetype)
-    vim.api.nvim_buf_set_lines(ui_elem.bufnr, 0, 1, false, lines)
+    if #lines == 0 and (last_row ~= 0 or last_col ~= 0) then
+        lines = {"", "", unpack(lines)}
+    end
+    vim.api.nvim_buf_set_text(ui_elem.bufnr, last_row, last_col, last_row, last_col, lines)
+    vim.api.nvim_win_set_cursor(ui_elem.winid, {last_row + 1, new_col})
+    vim.api.nvim_command('redraw')
 
     -- replace lines when ctrl-o pressed
     ui_elem:map("n", vim.g["codegpt_ui_commands"].use_as_output, function()
-        Utils.fix_indentation(bufnr, start_row, end_row, lines)
-        vim.api.nvim_buf_set_text(bufnr, start_row, start_col, end_row, end_col, lines)
+        local text = vim.api.nvim_buf_get_lines(ui_elem.bufnr, 0, -1, false)
+        Utils.fix_indentation(bufnr, start_row, end_row, text)
+        vim.api.nvim_buf_set_text(bufnr, start_row, start_col, end_row, end_col, text)
         ui_elem:unmount()
     end)
 
