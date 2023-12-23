@@ -14,7 +14,8 @@ function CodeGptModule.get_status(...)
 end
 
 function CodeGptModule.run_cmd(opts)
-    local text_selection = Utils.get_selected_lines()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local text_selection = Utils.get_selected_text(bufnr)
     local command_args = table.concat(opts.fargs, " ")
 
     local command = opts.fargs[1]

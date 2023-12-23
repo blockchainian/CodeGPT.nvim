@@ -88,7 +88,12 @@ function OpenAIProvider.handle_response(json, cb)
                     vim.api.nvim_buf_set_mark(bufnr, "<", 0, 0, {})
                     vim.api.nvim_buf_set_mark(bufnr, ">", 0, 0, {})
                 end
-                cb(Utils.parse_lines(response_text))
+                local lines = Utils.parse_lines(response_text)
+                if lines == nil then
+                    print("Error: No response text")
+                    return
+                end
+                cb(lines)
             end
         end
     end

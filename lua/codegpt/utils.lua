@@ -1,13 +1,21 @@
 Utils = {}
 
+function Utils.contains(table, element)
+    for _, value in pairs(table) do
+        if value == element then
+            return true
+        end
+    end
+    return false
+end
+
 function Utils.get_filetype()
     local bufnr = vim.api.nvim_get_current_buf()
     return vim.api.nvim_buf_get_option(bufnr, "filetype")
 end
 
-function Utils.get_visual_selection()
+function Utils.get_visual_selection(bufnr)
     local bufnr = vim.api.nvim_get_current_buf()
-
     local start_pos = vim.api.nvim_buf_get_mark(bufnr, "<")
     local end_pos = vim.api.nvim_buf_get_mark(bufnr, ">")
 
@@ -34,10 +42,14 @@ function Utils.get_visual_selection()
     return start_row, start_col, end_row, end_col
 end
 
-function Utils.get_selected_lines()
-    local bufnr = vim.api.nvim_get_current_buf()
-    local start_row, start_col, end_row, end_col = Utils.get_visual_selection()
+function Utils.get_selected_lines(bufnr)
+    local start_row, start_col, end_row, end_col = Utils.get_visual_selection(bufnr)
     local lines = vim.api.nvim_buf_get_text(bufnr, start_row, start_col, end_row, end_col, {})
+    return lines
+end
+
+function Utils.get_selected_text(bufnr)
+    local lines = Utils.get_selected_lines(bufnr)
     return table.concat(lines, "\n")
 end
 
@@ -77,22 +89,26 @@ end
 function Utils.trim_to_code_block(lines)
     if contains_code_block(lines) then
         return get_code_block(lines)
+    else
+        return lines
     end
-    return lines
 end
 
-function Utils.parse_lines(response_text)
+function Utils.parse_lines(s)
     if vim.g["codegpt_write_response_to_err_log"] then
-        vim.api.nvim_err_write("ChatGPT response: \n" .. response_text .. "\n")
+        vim.api.nvim_err_write("ChatGPT response: \n" .. s .. "\n")
     end
 
-    -- workaround for vim.fn.split
-    local lines = vim.fn.split(response_text, "\n")
-    if response_text:sub(-1) == "\n" then
-        table.insert(lines, "")
-        if #response_text == 1 then
-            table.insert(lines, "")
+    local lines = {}
+    local i = 1
+    while true do
+        local b, e = s:find("\n", i)
+        if not b then
+            table.insert(lines, s:sub(i))
+            break
         end
+        table.insert(lines, s:sub(i, b - 1))
+        i = e + 1
     end
     return lines
 end
@@ -109,6 +125,11 @@ function Utils.fix_indentation(bufnr, start_row, end_row, new_lines)
             min_indentation = #indentation
             original_identation = indentation
         end
+    end
+
+    -- Skip trailing blank lines
+    while #new_lines > 0 and new_lines[#new_lines]:match("^%s*$") do
+        table.remove(new_lines)
     end
 
     -- Change the existing lines in new_lines by adding the old identation

@@ -6,6 +6,10 @@ local function get_language()
     local filetype = Utils.get_filetype()
     if filetype == "cpp" then
         return "C++"
+    elseif filetype == 'javascriptreact' then
+        return "JSX"
+    elseif filetype == 'typescriptreact' then
+        return "TSX"
     else
         return filetype
     end
