@@ -35,13 +35,16 @@ local function setup_ui_element(lines, filetype, bufnr, start_row, start_col, en
     vim.api.nvim_buf_set_option(ui_elem.bufnr, "filetype", filetype)
 
     -- strip leading blank lines
-    if row == 0 then
+    if row == 0 and col == 0 then
         while #lines > 0 and lines[1]:match("^%s*$") do
             table.remove(lines, 1)
         end
-    -- start a new section for each response
+        if #lines > 0 then
+            lines[1] = '# ' .. lines[1]
+        end
+        -- start a new section for each response
     elseif #lines == 1 and #lines[1] == 0 then
-        lines = {"", "", "――――――――――", unpack(lines)}
+        lines = { '', '', '# ' }
     end
 
     vim.api.nvim_buf_set_text(ui_elem.bufnr, row, col, row, col, lines)
