@@ -16,7 +16,7 @@ local function get_offset(bufnr)
     return last_row - 1, #last_line
 end
 
-local function setup_ui_element(type, lines, filetype, bufnr, start_row, start_col, end_row, end_col, ui_elem)
+local function setup_ui_element(type, lines, filetype, bufnr, start_row, start_col, end_row, end_col, ui_elem, cancel)
     -- mount/open the component
     ui_elem:mount()
 
@@ -25,8 +25,16 @@ local function setup_ui_element(type, lines, filetype, bufnr, start_row, start_c
         ui_elem:unmount()
     end)
 
-    -- unmount component when key 'q'
+    ui_elem:map("n", vim.g["codegpt_ui_commands"].cancel, function()
+        if cancel then
+            cancel()
+        end
+    end, { noremap = true, silent = true })
+
     ui_elem:map("n", vim.g["codegpt_ui_commands"].quit, function()
+        if cancel then
+            cancel()
+        end
         ui_elem:unmount()
     end, { noremap = true, silent = true })
 
@@ -145,7 +153,7 @@ local function create_popup(type)
     return popup
 end
 
-function Ui.popup(lines, type, filetype, bufnr, start_row, start_col, end_row, end_col)
+function Ui.popup(lines, type, filetype, bufnr, start_row, start_col, end_row, end_col, cancel)
     local popup_type = vim.g["codegpt_popup_type"]
     local ui_elem = nil
     if popup_type == "horizontal" then
@@ -155,7 +163,7 @@ function Ui.popup(lines, type, filetype, bufnr, start_row, start_col, end_row, e
     else
         ui_elem = create_popup(type)
     end
-    setup_ui_element(type, lines, filetype, bufnr, start_row, start_col, end_row, end_col, ui_elem)
+    setup_ui_element(type, lines, filetype, bufnr, start_row, start_col, end_row, end_col, ui_elem, cancel)
 end
 
 return Ui

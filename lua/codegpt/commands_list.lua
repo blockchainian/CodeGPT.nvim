@@ -13,23 +13,23 @@ local cmd_default = {
 }
 
 CommandsList.CallbackTypes = {
-    ["text_popup"] = function(lines, bufnr, start_row, start_col, end_row, end_col)
+    ["text_popup"] = function(lines, bufnr, start_row, start_col, end_row, end_col, cancel)
         local popup_filetype = vim.g["codegpt_text_popup_filetype"]
-        Ui.popup(lines, 'text_popup', popup_filetype, bufnr, start_row, start_col, end_row, end_col)
+        Ui.popup(lines, 'text_popup', popup_filetype, bufnr, start_row, start_col, end_row, end_col, cancel)
     end,
-    ["code_popup"] = function(lines, bufnr, start_row, start_col, end_row, end_col)
+    ["code_popup"] = function(lines, bufnr, start_row, start_col, end_row, end_col, cancel)
         lines = Utils.trim_to_code_block(lines)
-        Ui.popup(lines, 'code_popup', Utils.get_filetype(), bufnr, start_row, start_col, end_row, end_col)
+        Ui.popup(lines, 'code_popup', Utils.get_filetype(), bufnr, start_row, start_col, end_row, end_col, cancel)
     end,
-    ["replace_lines"] = function(lines, bufnr, start_row, start_col, end_row, end_col)
+    ["replace_lines"] = function(lines, bufnr, start_row, start_col, end_row, end_col, cancel)
         lines = Utils.trim_to_code_block(lines)
         Utils.fix_indentation(bufnr, start_row, end_row, lines)
-        if vim.api.nvim_buf_is_valid(bufnr) == true then
-            -- FIXME: for streaming
+
+        -- only do so in batch mode and when the buffer hasn't been closed
+        if not cancel and vim.api.nvim_buf_is_valid(bufnr) == true then
             Utils.replace_lines(lines, bufnr, start_row, start_col, end_row, end_col)
         else
-            -- if the buffer is not valid, open a popup. This can happen when the user closes the previous popup window before the request is finished.
-            Ui.popup(lines, 'code_popup', Utils.get_filetype(), bufnr, start_row, start_col, end_row, end_col)
+            Ui.popup(lines, 'code_popup', Utils.get_filetype(), bufnr, start_row, start_col, end_row, end_col, cancel)
         end
     end,
     ["custom"] = nil,
@@ -53,7 +53,7 @@ function CommandsList.get_cmd_opts(cmd)
         -- merge language_instructions
         if opts.language_instructions ~= nil and user_set_opts.language_instructions ~= nil then
             user_set_opts.language_instructions =
-            vim.tbl_extend("force", opts.language_instructions, user_set_opts.language_instructions)
+                vim.tbl_extend("force", opts.language_instructions, user_set_opts.language_instructions)
         end
     end
 

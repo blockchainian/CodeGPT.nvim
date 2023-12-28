@@ -64,7 +64,7 @@ function OpenAIProvider.make_headers()
     return { Content_Type = "application/json", Authorization = "Bearer " .. token }
 end
 
-function OpenAIProvider.handle_response(json, cb)
+function OpenAIProvider.handle_response(json, cb, cancel)
     if json == nil then
         print("Response empty")
     elseif json.error then
@@ -93,7 +93,7 @@ function OpenAIProvider.handle_response(json, cb)
                     print("Error: No response text")
                     return
                 end
-                cb(lines)
+                cb(lines, cancel)
             end
         end
     end

@@ -241,7 +241,8 @@ vim.g["codegpt_text_popup_filetype"] = "markdown"
 ```lua
 vim.g["codegpt_ui_commands"] = {
   -- some default commands, you can remap the keys
-  quit = "q", -- key to quit the popup
+  cancel = "<esc>", -- key to cancel the chat
+  quit = "<q>", -- key to quit the popup
   use_as_output = "<c-o>", -- key to use the popup content as output and replace the original lines
   use_as_input = "<c-i>", -- key to use the popup content as input for a new API request
 }
@@ -327,7 +328,6 @@ vim.g["codegpt_vertical_popup_size"] = "20%"
 -- Open API key and api endpoint
 vim.g["codegpt_openai_api_key"] = os.getenv("OPENAI_API_KEY")
 vim.g["codegpt_chat_completions_url"] = "https://api.openai.com/v1/chat/completions"
-vim.g["codegpt_openai_api_provider"] = "OpenAI" -- or Azure
 
 -- clears visual selection after completion
 vim.g["codegpt_clear_visual_selection"] = true
