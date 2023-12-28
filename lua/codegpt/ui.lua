@@ -16,7 +16,7 @@ local function get_offset(bufnr)
     return last_row - 1, #last_line
 end
 
-local function setup_ui_element(lines, filetype, bufnr, start_row, start_col, end_row, end_col, ui_elem)
+local function setup_ui_element(type, lines, filetype, bufnr, start_row, start_col, end_row, end_col, ui_elem)
     -- mount/open the component
     ui_elem:mount()
 
@@ -39,12 +39,15 @@ local function setup_ui_element(lines, filetype, bufnr, start_row, start_col, en
         while #lines > 0 and lines[1]:match("^%s*$") do
             table.remove(lines, 1)
         end
-        if #lines > 0 then
+    end
+
+    -- add section header per response
+    if type == 'text_popup' then
+        if row == 0 and col == 0 and #lines > 0 then -- first
             lines[1] = '# ' .. lines[1]
+        elseif #lines == 1 and #lines[1] == 0 then   -- subsequent
+            lines = { '', '', '# ' }
         end
-        -- start a new section for each response
-    elseif #lines == 1 and #lines[1] == 0 then
-        lines = { '', '', '# ' }
     end
 
     vim.api.nvim_buf_set_text(ui_elem.bufnr, row, col, row, col, lines)
@@ -152,7 +155,7 @@ function Ui.popup(lines, type, filetype, bufnr, start_row, start_col, end_row, e
     else
         ui_elem = create_popup(type)
     end
-    setup_ui_element(lines, filetype, bufnr, start_row, start_col, end_row, end_col, ui_elem)
+    setup_ui_element(type, lines, filetype, bufnr, start_row, start_col, end_row, end_col, ui_elem)
 end
 
 return Ui
