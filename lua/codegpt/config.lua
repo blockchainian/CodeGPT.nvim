@@ -94,7 +94,7 @@ vim.g["codegpt_commands_defaults"] = {
 
 -- Popup commands
 vim.g["codegpt_ui_commands"] = {
-    cancel = "<esc>",
+    cancel = "<c-c>",
     quit = "q",
     use_as_output = "<c-o>",
     use_as_input = "<c-i>",
