@@ -43,6 +43,7 @@ function OpenAIProvider.make_request(command, cmd_opts, command_args, text_selec
 
     local request = {
         temperature = cmd_opts.temperature,
+        frequency_penalty = cmd_opts.frequency_penalty,
         n = cmd_opts.number_of_choices,
         model = cmd_opts.model,
         messages = messages,

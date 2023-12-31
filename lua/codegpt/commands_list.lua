@@ -6,6 +6,7 @@ local cmd_default = {
     model = "gpt-3.5-turbo",
     max_tokens = 4096,
     temperature = 0.8,
+    frequency_penalty = 1,
     number_of_choices = 1,
     system_message_template = "You are a {{language}} coding assistant.",
     user_message_template = "",
