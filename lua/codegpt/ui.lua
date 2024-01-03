@@ -20,11 +20,6 @@ local function setup_ui_element(type, lines, filetype, bufnr, start_row, start_c
     -- mount/open the component
     ui_elem:mount()
 
-    -- unmount component when cursor leaves buffer
-    ui_elem:on(event.BufLeave, function()
-        ui_elem:unmount()
-    end)
-
     ui_elem:map("n", vim.g["codegpt_ui_commands"].cancel, function()
         if cancel then
             cancel()
