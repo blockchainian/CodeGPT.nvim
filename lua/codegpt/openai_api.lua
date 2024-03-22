@@ -36,29 +36,6 @@ local function run_finished_hook()
     end
 end
 
-local function curl_batch_callback(response, cb)
-    local status = response.status
-    local body = response.body
-    if status ~= 200 then
-        body = body:gsub("%s+", " ")
-        print("Error: " .. status .. " " .. body)
-        return
-    end
-
-    if body == nil or body == "" then
-        print("Error: No body")
-        return
-    end
-
-    vim.schedule_wrap(function(msg)
-        local json = vim.fn.json_decode(msg)
-        -- no way to cancel a batch request
-        Providers.get_provider().handle_response(json, cb, nil)
-    end)(body)
-
-    run_finished_hook()
-end
-
 local function curl_stream_handler(error, response, cb, cancel)
     if error ~= nil then
         print("Error: " .. error)
@@ -102,9 +79,6 @@ function OpenAIApi.make_call(payload, cb)
         headers = headers,
         stream = function(error, data, self)
             curl_stream_handler(error, data, cb, OpenAIApi.cancel_call)
-        end,
-        callback = function(response)
-            curl_batch_callback(response, cb)
         end,
         on_error = function(err)
             print('Error:', err.message)
