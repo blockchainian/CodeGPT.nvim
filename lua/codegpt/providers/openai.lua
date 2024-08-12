@@ -20,26 +20,8 @@ local function generate_messages(command, cmd_opts, command_args, text_selection
     return messages
 end
 
-local function get_max_tokens(max_tokens, messages)
-    local ok, total_length = Utils.get_accurate_tokens(vim.fn.json_encode(messages))
-
-    if not ok then
-        for _, message in ipairs(messages) do
-            total_length = total_length + string.len(message.content)
-            total_length = total_length + string.len(message.role)
-        end
-    end
-
-    if total_length >= max_tokens then
-        error("Total length of messages exceeds max_tokens: " .. total_length .. " > " .. max_tokens)
-    end
-
-    return max_tokens - total_length
-end
-
 function OpenAIProvider.make_request(command, cmd_opts, command_args, text_selection)
     local messages = generate_messages(command, cmd_opts, command_args, text_selection)
-    local max_tokens = get_max_tokens(cmd_opts.max_tokens, messages)
 
     local request = {
         temperature = cmd_opts.temperature,
@@ -47,7 +29,7 @@ function OpenAIProvider.make_request(command, cmd_opts, command_args, text_selec
         n = cmd_opts.number_of_choices,
         model = cmd_opts.model,
         messages = messages,
-        max_tokens = max_tokens,
+        max_tokens = 4096,
         stream = true,
     }
 

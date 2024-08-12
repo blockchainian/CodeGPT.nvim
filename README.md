@@ -6,7 +6,6 @@ CodeGPT is a plugin for neovim that provides commands to interact with ChatGPT. 
 
 * Set environment variable `OPENAI_API_KEY` to your [openai api key](https://platform.openai.com/account/api-keys).
 * The plugins 'plenary' and 'nui' are also required.
-* OpenAI's tokenizer [tiktoken](https://github.com/openai/tiktoken) is recommended for accurate token count estimate.
 
 Installing with Lazy.
 
@@ -44,11 +43,6 @@ Installing with plugged.
 Plug("nvim-lua/plenary.nvim")
 Plug("MunifTanjim/nui.nvim")
 Plug("dpayne/CodeGPT.nvim")
-```
-
-Installing OpenAI's tokenizer
-```sh
-pip install tiktoken
 ```
 
 ## Commands
@@ -103,9 +97,9 @@ A full list of overrides
 
 | name | default | description |
 |------|---------|-------------|
-| model | "gpt-3.5-turbo" | The model to use. |
-| max_tokens | 4096 | The maximum number of tokens to use including the prompt tokens. |
-| temperature | 0.6 | 0 -> 1, what sampling temperature to use. |
+| model | "gpt-4o" | The model to use. |
+| max_tokens | 12800 | The maximum number of tokens to use including the prompt tokens. |
+| temperature | 0 | 0 -> 2, what sampling temperature to use. |
 | system_message_template | "" | Helps set the behavior of the assistant. |
 | user_message_template | "" | Instructs the assistant. |
 | callback_type | "replace_lines" | Controls what the plugin does with the response |
@@ -183,15 +177,15 @@ The default command configuration is:
 
 ```lua
 {
-    model = "gpt-3.5-turbo",
-    max_tokens = 4096,
-    temperature = 0.6,
+    model = "gpt-4o",
+    max_tokens = 12800,
+    temperature = 0,
     number_of_choices = 1,
     system_message_template = "",
     user_message_template = "",
     callback_type = "replace_lines",
 }
-```
+
 
 ## More Configuration Options
 

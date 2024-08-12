@@ -78,6 +78,7 @@ function OpenAIApi.make_call(payload, cb)
         body = payload_str,
         headers = headers,
         stream = function(error, data, self)
+            print('Data', data)
             curl_stream_handler(error, data, cb, OpenAIApi.cancel_call)
         end,
         on_error = function(err)
